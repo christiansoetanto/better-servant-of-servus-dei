@@ -1,20 +1,25 @@
 package dbot
 
 import (
+	"cloud.google.com/go/firestore"
+	"context"
 	"github.com/bwmarrin/discordgo"
 	"github.com/christiansoetanto/better-servant-of-servus-dei/config"
+	"log"
 )
 
 type Bot struct {
-	Cfg     config.Config
-	Session *discordgo.Session
+	Cfg             config.Config
+	Session         *discordgo.Session
+	FirestoreClient *firestore.Client
 }
 
-const TOKEN = "OTc0MzExMDU5NjgwODIxMjY4.GgLLqU.Sq8jkCbzRYS-4uQVa3U31V9pgvQNjCrKWvKLtA"
+const TOKEN = "OTc0MzExMDU5NjgwODIxMjY4.GukOAG.Cn99_DaXraufhv6m7CxoyXNgqQq7AmmqSIx0Qc"
 
-func New(cfg config.Config) *Bot {
+func New(cfg config.Config, firestoreClient *firestore.Client) *Bot {
 	return &Bot{
-		Cfg: cfg,
+		Cfg:             cfg,
+		FirestoreClient: firestoreClient,
 	}
 }
 
@@ -28,6 +33,22 @@ func (b *Bot) OpenConnection() error {
 }
 
 func (b *Bot) LoadAllHandlers() {
-	b.Session.AddHandler(b.readyHandler())
-	b.Session.AddHandler(b.messageHandler())
+	b.initReadyHandler()
+	b.initMessageHandler()
+}
+
+func (b *Bot) InitAllCronJobs() {
+	b.initCronJob()
+}
+
+func (b *Bot) TestFirestore(ctx context.Context) {
+	ref, res, err := b.FirestoreClient.Collection("users").Add(ctx, map[string]interface{}{
+		"first": "Ada",
+		"last":  "Lovelace",
+		"born":  1815,
+	})
+	_, _ = ref, res
+	if err != nil {
+		log.Fatalf("Failed adding alovelace: %v", err)
+	}
 }

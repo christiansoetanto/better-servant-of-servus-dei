@@ -5,6 +5,5 @@ type Wording struct {
 	WelcomeMessageEmbedFormat    string
 	WelcomeMessageFormat         string
 	MissedQuestionOneFormat      string
-	MissedQuestionOneFormatNoPS  string
 	WelcomeTitle                 string
 }

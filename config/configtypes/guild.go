@@ -10,8 +10,6 @@ type GuildConfig struct {
 }
 
 type Guild struct {
-	GuildID   GuildID
-	GuildName GuildName
+	GuildID   string
+	GuildName string
 }
-type GuildID string
-type GuildName string

@@ -1,6 +1,6 @@
 package configtypes
 
 type Reaction struct {
-	Upvote ReactionID
+	Upvote string
+	Dab    string
 }
-type ReactionID string

@@ -1,15 +1,15 @@
 package configtypes
 
 type Role struct {
-	Vetting            RoleId
-	VettingQuestioning RoleId
-	ApprovedUser       RoleId
-	LatinCatholic      RoleId
-	EasternCatholic    RoleId
-	OrthodoxChristian  RoleId
-	RCIACatechumen     RoleId
-	Protestant         RoleId
-	NonCatholic        RoleId
-	Atheist            RoleId
+	Vetting            string
+	VettingQuestioning string
+	ApprovedUser       string
+	LatinCatholic      string
+	EasternCatholic    string
+	OrthodoxChristian  string
+	RCIACatechumen     string
+	Protestant         string
+	NonCatholic        string
+	Atheist            string
+	Moderator          string
 }
-type RoleId string

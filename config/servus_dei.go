@@ -23,6 +23,7 @@ func getServusDeiConfig() configtypes.GuildConfig {
 			VettingQuestioning:           "914987511481249792",
 			RulesVetting:                 "775654889934159893",
 			LiturgicalCalendarDiscussion: "915621423270211594",
+			BotTesting:                   "929367689057693757",
 		},
 		Role: configtypes.Role{
 			Vetting:            "751145124834312342",
@@ -35,6 +36,7 @@ func getServusDeiConfig() configtypes.GuildConfig {
 			Protestant:         "751145951137103872",
 			NonCatholic:        "751146099351224382",
 			Atheist:            "751148904938209351",
+			Moderator:          "751144316843327599",
 		},
 		Moderator: configtypes.Moderator{
 			"255514888041005057": "soetanto",
@@ -58,10 +60,9 @@ func getServusDeiConfig() configtypes.GuildConfig {
 		Wording: configtypes.Wording{
 			AcknowledgementMessageFormat: "Verification of user <@%s> with role <@&%s> is successful.\nThank you for using my service. Beep. Boop.\n",
 			WelcomeMessageEmbedFormat:    "Welcome to Servus Dei, <@%s>! We are happy to have you! Make sure you check out <#%s> to gain access to the various channels we offer and please do visit <#%s> so you can understand our server better and take use of everything we have to offer. God Bless!",
-			WelcomeMessageFormat:         "Hey <@%s>! It looks like you missed question 1. Please re-read the <#%s> again, we assure you that the code is in there. Thank you for your understanding.\nPS: if you are sure you got it right, please ignore this message.",
 			MissedQuestionOneFormat:      "Hey <@%s>! It looks like you missed question 1. Please re-read the <#%s> again, we assure you that the code is in there. Thank you for your understanding.",
-			MissedQuestionOneFormatNoPS:  "Welcome to Servus Dei!",
-			WelcomeTitle:                 "Hey %s! %s just approved your vetting response. Welcome to the server. Feel free to tag us should you have further questions. Enjoy!",
+			WelcomeTitle:                 "Welcome to Servus Dei!",
+			WelcomeMessageFormat:         "Hey %s! %s just approved your vetting response. Welcome to the server. Feel free to tag us should you have further questions. Enjoy!",
 		},
 	}
 }
