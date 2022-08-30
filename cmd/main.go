@@ -44,7 +44,7 @@ func main() {
 	}
 
 	defer func() {
-		usecaseObject.CloseSessionConnection()
+		_ = usecaseObject.CloseSessionConnection()
 	}()
 
 	// Wait here until CTRL-C or other term signal is received.
