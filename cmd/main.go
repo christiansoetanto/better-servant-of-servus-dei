@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/christiansoetanto/better-servant-of-servus-dei/config"
+	"github.com/christiansoetanto/better-servant-of-servus-dei/database"
 	"github.com/christiansoetanto/better-servant-of-servus-dei/dbot"
-	"github.com/christiansoetanto/better-servant-of-servus-dei/fstore"
+	"github.com/christiansoetanto/better-servant-of-servus-dei/provider"
+	"github.com/christiansoetanto/better-servant-of-servus-dei/usecase"
 	"log"
 	"os"
 	"os/signal"
@@ -17,41 +19,40 @@ const DEVMODE = true
 func main() {
 	fmt.Println("Hello World!")
 	ctx := context.Background()
-
 	cfg := config.Init(DEVMODE)
-	firestoreClient, err := fstore.Init(ctx)
-	defer firestoreClient.Close()
+	database.New(ctx, cfg.AppConfig)
+	defer database.Close(ctx)
 
-	if err != nil {
-		log.Fatalf("Failed to init firestore: %v", err)
-		return
-	}
-	dbot := dbot.New(cfg, firestoreClient, DEVMODE)
-	err = dbot.NewSession()
-	if err != nil {
-		log.Fatalf("error creating Discord session: %v", err)
-		return
+	providerResource := &provider.Resource{
+		AppConfig: cfg.AppConfig,
+		Database:  database.GetDBObject(ctx, cfg.AppConfig),
 	}
 
-	dbot.LoadAllHandlers()
-	dbot.InitAllCronJobs()
+	prov := provider.GetProvider(providerResource)
 
-	dbot.SetIntent()
-	err = dbot.OpenConnection()
-	if err != nil {
-		log.Fatalf("error opening Discord connection: %v", err)
-		return
+	session := dbot.New()
+	usecaseResource := &usecase.Resource{
+		Provider: prov,
+		Config:   cfg,
+		Session:  session,
 	}
 
-	defer dbot.Session.Close()
+	usecaseObject := usecase.GetUsecaseObject(usecaseResource)
+	err := usecaseObject.Init(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer func() {
+		usecaseObject.CloseSessionConnection()
+	}()
 
 	// Wait here until CTRL-C or other term signal is received.
-	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
+	fmt.Println("Session is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
 	//syscall.SIGTERM,
 	signal.Notify(sc, syscall.SIGINT)
 	<-sc
 
 	log.Println("Gracefully shutting down.")
-	return
 }

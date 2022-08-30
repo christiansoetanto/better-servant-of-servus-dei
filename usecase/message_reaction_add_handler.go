@@ -1,4 +1,4 @@
-package dbot
+package usecase
 
 import (
 	"fmt"
@@ -14,8 +14,8 @@ const (
 	MaxMessageAmount = 3000
 )
 
-func (b *Bot) initReactionAddHandler() {
-	b.Session.AddHandler(b.religiousQuestionReactionAddHandler)
+func (u *usecase) initReactionAddHandler() {
+	u.Session.AddHandler(u.religiousQuestionReactionAddHandler)
 }
 
 type answersMap map[string][]answer
@@ -24,12 +24,12 @@ type answer struct {
 	url  string
 }
 
-func (b *Bot) religiousQuestionReactionAddHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
+func (u *usecase) religiousQuestionReactionAddHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	if m.UserID == s.State.User.ID {
 		return
 	}
-	cfg, err := b.getGuildConfig(m.GuildID)
-	if err != nil {
+	cfg, ok := u.getGuildConfig(m.GuildID)
+	if !ok {
 		return
 	}
 	if m.ChannelID != cfg.Channel.ReligiousQuestions {
@@ -38,7 +38,7 @@ func (b *Bot) religiousQuestionReactionAddHandler(s *discordgo.Session, m *disco
 	if m.Emoji.ID != cfg.Reaction.Upvote {
 		return
 	}
-	if !b.isMod(m.UserID, cfg) {
+	if !u.isMod(m.UserID, cfg) {
 		return
 	}
 
@@ -49,33 +49,33 @@ func (b *Bot) religiousQuestionReactionAddHandler(s *discordgo.Session, m *disco
 		return
 	}
 	question, questionAskerId := message.Content, message.Author.ID
-	answers, err := b.getAllAnswers(m.ChannelID, m.MessageID, cfg)
+	answers, err := u.getAllAnswers(m.ChannelID, m.MessageID, cfg)
 	if err != nil {
-		b.errorReporter(err)
+		u.errorReporter(err)
 		return
 	}
 	if answers == nil {
 		return
 	}
 
-	answers, err = b.generateAnswerUrl(answers, question, cfg.Guild.GuildID)
+	answers, err = u.generateAnswerUrl(answers, question, cfg.Guild.GuildID)
 	if err != nil {
-		b.errorReporter(err)
+		u.errorReporter(err)
 		return
 	}
-	err = b.archiveQuestion(answers, questionAskerId, questionId, question, cfg)
+	err = u.archiveQuestion(answers, questionAskerId, questionId, question, cfg)
 	if err != nil {
-		b.errorReporter(err)
+		u.errorReporter(err)
 		return
 	}
 }
 
-func (b *Bot) getAllAnswers(channelId, messageId string, cfg configtypes.GuildConfig) (answersMap, error) {
-	rd1, err := b.getAnswersForChannel(channelId, messageId, cfg.Reaction.ReligiousDiscussionOneWhiteCheckmark)
+func (u *usecase) getAllAnswers(channelId, messageId string, cfg configtypes.GuildConfig) (answersMap, error) {
+	rd1, err := u.getAnswersForChannel(channelId, messageId, cfg.Reaction.ReligiousDiscussionOneWhiteCheckmark)
 	if err != nil {
 		return nil, err
 	}
-	rd2, err := b.getAnswersForChannel(channelId, messageId, cfg.Reaction.ReligiousDiscussionsTwoBallotBoxWithCheck)
+	rd2, err := u.getAnswersForChannel(channelId, messageId, cfg.Reaction.ReligiousDiscussionsTwoBallotBoxWithCheck)
 	if err != nil {
 		return nil, err
 	}
@@ -90,8 +90,8 @@ func (b *Bot) getAllAnswers(channelId, messageId string, cfg configtypes.GuildCo
 	return answersMap, nil
 }
 
-func (b *Bot) getAnswersForChannel(channelId, messageId, reactionId string) ([]answer, error) {
-	users, err := b.Session.MessageReactions(channelId, messageId, reactionId, 0, "", "")
+func (u *usecase) getAnswersForChannel(channelId, messageId, reactionId string) ([]answer, error) {
+	users, err := u.Session.MessageReactions(channelId, messageId, reactionId, 0, "", "")
 	if err != nil {
 		return nil, err
 	}
@@ -109,14 +109,14 @@ func answersBuilder(users []*discordgo.User) []answer {
 	return answers
 }
 
-func (b *Bot) generateAnswerUrl(answerMap answersMap, question, guildId string) (answersMap, error) {
+func (u *usecase) generateAnswerUrl(answerMap answersMap, question, guildId string) (answersMap, error) {
 	for channelId := range answerMap {
 		answers := answerMap[channelId]
 		lastMessageId := ""
 		totalAnswerToBeFound := len(answers)
 		for i := 0; i < MaxMessageAmount/LimitPerRequest && totalAnswerToBeFound > 0; i++ {
 			fmt.Printf("current iter: %d, max iter: %d, answer left: %d\n", i, MaxMessageAmount/LimitPerRequest, totalAnswerToBeFound)
-			messages, err := b.Session.ChannelMessages(channelId, LimitPerRequest, lastMessageId, "", "")
+			messages, err := u.Session.ChannelMessages(channelId, LimitPerRequest, lastMessageId, "", "")
 			if err != nil {
 				return nil, err
 			}
@@ -145,7 +145,7 @@ func (b *Bot) generateAnswerUrl(answerMap answersMap, question, guildId string) 
 	return answerMap, nil
 }
 
-func (b *Bot) archiveQuestion(answers answersMap, questionAskerId, questionId, questionContent string, cfg configtypes.GuildConfig) error {
+func (u *usecase) archiveQuestion(answers answersMap, questionAskerId, questionId, questionContent string, cfg configtypes.GuildConfig) error {
 	title := "Religious Question Police!"
 	description := fmt.Sprintf("\nQuestion by <@%s>:\n\n%s\n", questionAskerId, questionContent)
 	fieldValue := ""
@@ -167,14 +167,14 @@ func (b *Bot) archiveQuestion(answers answersMap, questionAskerId, questionId, q
 	})
 	embed := util.EmbedBuilder(title, description, fields)
 
-	_, err := b.Session.ChannelMessageSendEmbed(cfg.Channel.AnsweredQuestions, embed)
+	_, err := u.Session.ChannelMessageSendEmbed(cfg.Channel.AnsweredQuestions, embed)
 
 	if err != nil {
 		return err
 	}
 
-	if !b.DevMode {
-		err = b.Session.ChannelMessageDelete(cfg.Channel.ReligiousQuestions, questionId)
+	if !u.Config.AppConfig.DevMode {
+		err = u.Session.ChannelMessageDelete(cfg.Channel.ReligiousQuestions, questionId)
 		if err != nil {
 			return err
 		}

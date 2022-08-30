@@ -1,4 +1,4 @@
-package dbot
+package usecase
 
 import (
 	"fmt"
@@ -13,9 +13,9 @@ const INRI = "inri"
 const ANDGIVEUSTHECODE = "andgiveusthecode"
 const WHATCODE = "whatcode"
 
-func (b *Bot) initMessageHandler() {
-	b.Session.AddHandler(b.invalidVettingResponseHandler)
-	b.Session.AddHandler(b.vettingQuestioningResponseHandler)
+func (u *usecase) initMessageHandler() {
+	u.Session.AddHandler(u.invalidVettingResponseHandler)
+	u.Session.AddHandler(u.vettingQuestioningResponseHandler)
 }
 
 func detectVettingResponse(input string) bool {
@@ -35,12 +35,12 @@ func isValidVettingResponse(input string) bool {
 	return true
 }
 
-func (b *Bot) invalidVettingResponseHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (u *usecase) invalidVettingResponseHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	cfg, ok := b.getGuildConfig(m.GuildID)
-	if ok != nil {
+	cfg, ok := u.getGuildConfig(m.GuildID)
+	if !ok {
 		return
 	}
 	if m.ChannelID != cfg.Channel.Responses {
@@ -57,12 +57,12 @@ func (b *Bot) invalidVettingResponseHandler(s *discordgo.Session, m *discordgo.M
 		}
 	}
 }
-func (b *Bot) vettingQuestioningResponseHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (u *usecase) vettingQuestioningResponseHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	cfg, ok := b.getGuildConfig(m.GuildID)
-	if ok != nil {
+	cfg, ok := u.getGuildConfig(m.GuildID)
+	if !ok {
 		return
 	}
 	if m.ChannelID != cfg.Channel.VettingQuestioning {
@@ -79,12 +79,12 @@ func (b *Bot) vettingQuestioningResponseHandler(s *discordgo.Session, m *discord
 			Reference: m.Reference(),
 		})
 		if err != nil {
-			b.errorReporter(err)
+			u.errorReporter(err)
 			return
 		}
 		err = s.ChannelMessageDelete(m.ChannelID, m.ID)
 		if err != nil {
-			b.errorReporter(err)
+			u.errorReporter(err)
 			return
 		}
 	}

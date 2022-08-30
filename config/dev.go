@@ -4,7 +4,7 @@ import (
 	"github.com/christiansoetanto/better-servant-of-servus-dei/config/configtypes"
 )
 
-func getDevConfig() configtypes.GuildConfig {
+func getDevGuildConfig() configtypes.GuildConfig {
 	return configtypes.GuildConfig{
 		Guild: configtypes.Guild{
 			GuildName: "Local Server",

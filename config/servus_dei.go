@@ -4,7 +4,7 @@ import (
 	"github.com/christiansoetanto/better-servant-of-servus-dei/config/configtypes"
 )
 
-func getServusDeiConfig() configtypes.GuildConfig {
+func getServusDeiGuildConfig() configtypes.GuildConfig {
 	return configtypes.GuildConfig{
 		Guild: configtypes.Guild{
 			GuildID:   "751139261515825162",

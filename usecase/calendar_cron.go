@@ -1,10 +1,10 @@
-package dbot
+package usecase
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bwmarrin/discordgo"
 	"github.com/christiansoetanto/better-servant-of-servus-dei/util"
-	"github.com/robfig/cron/v3"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"io/ioutil"
@@ -65,48 +65,44 @@ type MessageItem struct {
 	Text string `json:"text"`
 }
 
-const DailyCron = "@daily"
-const Every5SecondCron = "@every 5s"
-
-func (b *Bot) initCronJob() {
-	c := cron.New()
-	_, err := c.AddFunc(DailyCron, b.liturgicalCalendarCronJob)
-	if err != nil {
-		return
-	}
-	c.Start()
-}
-
-func (b *Bot) liturgicalCalendarCronJob() {
+func (u *usecase) generateCalendarEmbed() (*discordgo.MessageEmbed, error) {
 	functionsUrl := os.Getenv("ROMCAL_API_FUNCTIONS_URL")
 	response, err := http.Get(functionsUrl)
 	if err != nil {
-		b.errorReporter(err)
-		return
+		return nil, err
 	}
 	data, _ := ioutil.ReadAll(response.Body)
 
 	var allLiturgicalDays AllLiturgicalDays
 	err = json.Unmarshal(data, &allLiturgicalDays)
 	if err != nil {
-		b.errorReporter(err)
-		return
+		return nil, err
 	}
 
 	currentTime := time.Now()
 	text := getCelebrations(allLiturgicalDays.LiturgicalDaysEn)
 	title := fmt.Sprintf("%s, %d %s %d", currentTime.Weekday(), currentTime.Day(), currentTime.Month(), currentTime.Year())
-	for _, config := range b.Cfg {
-		_, err = b.Session.ChannelMessageSendEmbed(config.Channel.BotTesting, util.EmbedBuilder(title, text))
+	embed := util.EmbedBuilder(title, text)
+	return embed, nil
+}
+
+func (u *usecase) liturgicalCalendarCronJob() {
+	embed, err := u.generateCalendarEmbed()
+	if err != nil {
+		u.errorReporter(err)
+		return
+	}
+	for _, config := range u.Config.GuildConfig {
+		_, err = u.Session.ChannelMessageSendEmbed(config.Channel.BotTesting, embed)
 		if err != nil {
-			b.errorReporter(err)
+			u.errorReporter(err)
 			return
 		}
 	}
 }
 
 func getCelebrations(liturgicalDays []LiturgicalDay) string {
-	text := "The Roman Catholic Church is celebrating:\n\n"
+	text := "The Roman Catholic Church is celebrating:\n"
 	for _, day := range liturgicalDays {
 		text += "• "
 		//[day, date] //if memorial/feast/solemnity [rank] [name] in [seasonName] season.
