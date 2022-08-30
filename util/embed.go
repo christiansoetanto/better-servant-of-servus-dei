@@ -17,11 +17,15 @@ type ImageUrl string
 
 func EmbedBuilder(title string, description string, param ...interface{}) *discordgo.MessageEmbed {
 	var imageUrl string
+	var fields []*discordgo.MessageEmbedField
 	for _, p := range param {
 		switch v := p.(type) {
 		case ImageUrl:
 			imageUrl = string(v)
+		case []*discordgo.MessageEmbedField:
+			fields = v
 		}
+
 	}
 	return &discordgo.MessageEmbed{
 		Type:        discordgo.EmbedTypeRich,
@@ -35,6 +39,7 @@ func EmbedBuilder(title string, description string, param ...interface{}) *disco
 		Image: &discordgo.MessageEmbedImage{
 			URL: imageUrl,
 		},
-		URL: ServusDeiWebsiteURL,
+		URL:    ServusDeiWebsiteURL,
+		Fields: fields,
 	}
 }

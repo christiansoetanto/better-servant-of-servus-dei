@@ -12,20 +12,26 @@ type Bot struct {
 	Cfg             config.Config
 	Session         *discordgo.Session
 	FirestoreClient *firestore.Client
+	DevMode         bool
 }
 
 const TOKEN = "OTc0MzExMDU5NjgwODIxMjY4.GukOAG.Cn99_DaXraufhv6m7CxoyXNgqQq7AmmqSIx0Qc"
 
-func New(cfg config.Config, firestoreClient *firestore.Client) *Bot {
+func New(cfg config.Config, firestoreClient *firestore.Client, devMode bool) *Bot {
 	return &Bot{
 		Cfg:             cfg,
 		FirestoreClient: firestoreClient,
+		DevMode:         devMode,
 	}
 }
 
 func (b *Bot) NewSession() (err error) {
 	b.Session, err = discordgo.New("Bot " + TOKEN)
 	return err
+}
+
+func (b *Bot) SetIntent() {
+	b.Session.Identify.Intents = discordgo.IntentGuildMessages | discordgo.IntentGuildMessageReactions | discordgo.IntentDirectMessages
 }
 
 func (b *Bot) OpenConnection() error {
@@ -35,6 +41,7 @@ func (b *Bot) OpenConnection() error {
 func (b *Bot) LoadAllHandlers() {
 	b.initReadyHandler()
 	b.initMessageHandler()
+	b.initReactionAddHandler()
 }
 
 func (b *Bot) InitAllCronJobs() {

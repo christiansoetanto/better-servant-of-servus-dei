@@ -42,8 +42,10 @@ func getDevConfig() configtypes.GuildConfig {
 			"255514888041005057": "soetanto",
 		},
 		Reaction: configtypes.Reaction{
-			Upvote: "1013782200052887683",
-			Dab:    "<:Upvote:1013782200052887683>",
+			Upvote:                               "1013782200052887683",
+			Dab:                                  "<:Upvote:1013782200052887683>",
+			ReligiousDiscussionOneWhiteCheckmark: "✅",
+			ReligiousDiscussionsTwoBallotBoxWithCheck: "☑️",
 		},
 		Wording: configtypes.Wording{
 			AcknowledgementMessageFormat: "Verification of user <@%s> with role <@&%s> is successful.\nThank you for using my service. Beep. Boop.\n",

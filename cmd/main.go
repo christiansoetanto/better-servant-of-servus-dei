@@ -12,11 +12,13 @@ import (
 	"syscall"
 )
 
+const DEVMODE = true
+
 func main() {
 	fmt.Println("Hello World!")
 	ctx := context.Background()
 
-	cfg := config.Init()
+	cfg := config.Init(DEVMODE)
 	firestoreClient, err := fstore.Init(ctx)
 	defer firestoreClient.Close()
 
@@ -24,7 +26,7 @@ func main() {
 		log.Fatalf("Failed to init firestore: %v", err)
 		return
 	}
-	dbot := dbot.New(cfg, firestoreClient)
+	dbot := dbot.New(cfg, firestoreClient, DEVMODE)
 	err = dbot.NewSession()
 	if err != nil {
 		log.Fatalf("error creating Discord session: %v", err)
@@ -34,6 +36,7 @@ func main() {
 	dbot.LoadAllHandlers()
 	dbot.InitAllCronJobs()
 
+	dbot.SetIntent()
 	err = dbot.OpenConnection()
 	if err != nil {
 		log.Fatalf("error opening Discord connection: %v", err)

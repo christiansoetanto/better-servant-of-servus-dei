@@ -28,7 +28,7 @@ func detectVettingResponse(input string) bool {
 }
 
 func isValidVettingResponse(input string) bool {
-	input = strings.ReplaceAll(util.Sanitize(input), "latinrite", "")
+	input = strings.ReplaceAll(util.ToOnlyAlphanum(input), "latinrite", "")
 	if detectVettingResponse(input) && !strings.Contains(input, INRI) {
 		return false
 	}
@@ -68,7 +68,7 @@ func (b *Bot) vettingQuestioningResponseHandler(s *discordgo.Session, m *discord
 	if m.ChannelID != cfg.Channel.VettingQuestioning {
 		return
 	}
-	if strings.Contains(util.Sanitize(m.Content), INRI) {
+	if strings.Contains(util.OnlyAlphanumAndSpace(m.Content), INRI) {
 		title := fmt.Sprintf("Vetting Police! %s", cfg.Reaction.Dab)
 		description := fmt.Sprintf("\nNice job, <@%s>! <@&%s> give this man a cookie.\n\n\nPS: this is a joke. please wait for our human (or are they) mods to verify you.", m.Author.ID, cfg.Role.Moderator)
 		embed := util.EmbedBuilder(title, description)
