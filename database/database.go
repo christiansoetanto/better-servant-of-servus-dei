@@ -35,8 +35,10 @@ func Init(ctx context.Context, cfg config.AppConfig) error {
 	obj = &Obj{connectedDbs: make(map[DBType]*firestore.Client)}
 	client, err := firestore.NewClient(ctx, cfg.FirestoreProjectId)
 	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
 		return err
 	}
+	log.Println("Firestore client created")
 	obj.connectedDbs[FirestoreDb] = client
 	return nil
 }

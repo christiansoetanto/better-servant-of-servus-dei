@@ -1,14 +1,14 @@
 package dbot
 
 import (
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"log"
+	"os"
 )
 
-const TOKEN = "OTc0MzExMDU5NjgwODIxMjY4.GukOAG.Cn99_DaXraufhv6m7CxoyXNgqQq7AmmqSIx0Qc"
-
 func New() *discordgo.Session {
-	session, err := discordgo.New("Bot " + TOKEN)
+	session, err := discordgo.New(fmt.Sprintf("Bot %s", os.Getenv("BOTTOKEN")))
 	if err != nil {
 		log.Fatal(err)
 	}
