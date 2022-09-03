@@ -1,0 +1,18 @@
+branch-defaults:
+  master:
+    environment: better-servant-of-servus-dei-dev
+    group_suffix: null
+global:
+  application_name: better-servant-of-servus-dei
+  branch: null
+  default_ec2_keyname: null
+  default_platform: Go 1 running on 64bit Amazon Linux 2
+  default_region: us-west-2
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  profile: eb-cli
+  repository: null
+  sc: git
+  workspace_type: Application

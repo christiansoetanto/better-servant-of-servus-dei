@@ -29,7 +29,7 @@ var once sync.Once
 func GetProvider(resource *Resource) Provider {
 	once.Do(func() {
 		obj = &provider{
-			Dbms:      dbms.GetDbmsClient(resource.Database),
+			//Dbms:      dbms.GetDbmsClient(resource.Database),
 			AppConfig: resource.AppConfig,
 		}
 	})
