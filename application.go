@@ -22,6 +22,7 @@ func main() {
 		log.Fatal("Error parsing DEVMODE environment variable")
 		return
 	}
+
 	cfg := config.Init(devMode)
 	//database.New(ctx, cfg.AppConfig)
 	//defer database.Close(ctx)
