@@ -58,36 +58,12 @@ func (u *usecase) registerSlashCommand() {
 			Description: "Get today's liturgical calendar",
 		},
 	}
-
-	for _, v := range commands {
-		for guildId := range u.Config.GuildConfig {
-			_, err := u.Session.ApplicationCommandCreate(u.Session.State.User.ID, guildId, v)
-			if err != nil {
-				log.Fatalf("Cannot create '%v' command: %v", v.Name, err)
-			}
-		}
-	}
-
-}
-
-func (u *usecase) DoRemoveSlashCommand() error {
-	log.Println("Removing commands...")
 	for guildId := range u.Config.GuildConfig {
-		cmd, err := u.Session.ApplicationCommands(u.Session.State.User.ID, guildId)
+		_, err := u.Session.ApplicationCommandBulkOverwrite(u.Session.State.User.ID, guildId, commands)
 		if err != nil {
-			return err
-		}
-		for _, v := range cmd {
-			err = u.Session.ApplicationCommandDelete(u.Session.State.User.ID, guildId, v.ID)
-			if err != nil {
-				log.Fatalf("Cannot delete '%v' command: %v", v.Name, err)
-				return err
-			}
+			log.Fatalf("Cannot create command: %v", err)
 		}
 	}
-	log.Println("Done removing commands...")
-
-	return nil
 }
 
 func (u *usecase) initCommandHandler() {

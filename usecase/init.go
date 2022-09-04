@@ -24,7 +24,6 @@ type Usecase interface {
 	Init(ctx context.Context) error
 	OpenSessionConnection() error
 	CloseSessionConnection() error
-	DoRemoveSlashCommand() error
 	DoHelloWorld(ctx context.Context)
 }
 
@@ -49,10 +48,6 @@ func (u *usecase) Init(ctx context.Context) error {
 	u.LoadAllHandlers()
 
 	err := u.OpenSessionConnection()
-	if err != nil {
-		return err
-	}
-	err = u.DoRemoveSlashCommand()
 	if err != nil {
 		return err
 	}
