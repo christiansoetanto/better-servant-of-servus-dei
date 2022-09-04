@@ -8,10 +8,10 @@ import (
 type commandHandler map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) error
 
 const (
-	PingCommand          = "ping"
-	SDVerifyCommand      = "sdverify"
-	SDQuestionOneCommand = "sdquestionone"
-	CalendarCommand      = "calendar"
+	PingCommand          = "pingv2"
+	SDVerifyCommand      = "sdverifyv2"
+	SDQuestionOneCommand = "sdquestiononev2"
+	CalendarCommand      = "calendarv2"
 	NiceTryBro           = "Nice try, bro! You are not allowed to use this command... <@255514888041005057>"
 )
 
