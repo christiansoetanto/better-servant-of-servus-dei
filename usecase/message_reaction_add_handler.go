@@ -5,7 +5,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/christiansoetanto/better-servant-of-servus-dei/config/configtypes"
 	"github.com/christiansoetanto/better-servant-of-servus-dei/util"
-	"log"
 	"strings"
 )
 
@@ -45,7 +44,7 @@ func (u *usecase) religiousQuestionReactionAddHandler(s *discordgo.Session, m *d
 	questionId := m.MessageID
 	message, err := s.ChannelMessage(cfg.Channel.ReligiousQuestions, questionId)
 	if err != nil {
-		log.Println(err)
+		u.errorReporter(err)
 		return
 	}
 	question, questionAskerId := message.Content, message.Author.ID
@@ -73,10 +72,12 @@ func (u *usecase) religiousQuestionReactionAddHandler(s *discordgo.Session, m *d
 func (u *usecase) getAllAnswers(channelId, messageId string, cfg configtypes.GuildConfig) (answersMap, error) {
 	rd1, err := u.getAnswersForChannel(channelId, messageId, cfg.Reaction.ReligiousDiscussionOneWhiteCheckmark)
 	if err != nil {
+		u.errorReporter(err)
 		return nil, err
 	}
 	rd2, err := u.getAnswersForChannel(channelId, messageId, cfg.Reaction.ReligiousDiscussionsTwoBallotBoxWithCheck)
 	if err != nil {
+		u.errorReporter(err)
 		return nil, err
 	}
 	answersMap := make(answersMap)
@@ -93,6 +94,7 @@ func (u *usecase) getAllAnswers(channelId, messageId string, cfg configtypes.Gui
 func (u *usecase) getAnswersForChannel(channelId, messageId, reactionId string) ([]answer, error) {
 	users, err := u.Session.MessageReactions(channelId, messageId, reactionId, 0, "", "")
 	if err != nil {
+		u.errorReporter(err)
 		return nil, err
 	}
 	answers := answersBuilder(users)
@@ -118,6 +120,7 @@ func (u *usecase) generateAnswerUrl(answerMap answersMap, question, guildId stri
 			fmt.Printf("current iter: %d, max iter: %d, answer left: %d\n", i, MaxMessageAmount/LimitPerRequest, totalAnswerToBeFound)
 			messages, err := u.Session.ChannelMessages(channelId, LimitPerRequest, lastMessageId, "", "")
 			if err != nil {
+				u.errorReporter(err)
 				return nil, err
 			}
 			if len(messages) == 0 {
@@ -170,12 +173,14 @@ func (u *usecase) archiveQuestion(answers answersMap, questionAskerId, questionI
 	_, err := u.Session.ChannelMessageSendEmbed(cfg.Channel.AnsweredQuestions, embed)
 
 	if err != nil {
+		u.errorReporter(err)
 		return err
 	}
 
 	if !u.Config.AppConfig.DevMode {
 		err = u.Session.ChannelMessageDelete(cfg.Channel.ReligiousQuestions, questionId)
 		if err != nil {
+			u.errorReporter(err)
 			return err
 		}
 	}

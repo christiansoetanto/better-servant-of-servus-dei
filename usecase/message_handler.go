@@ -52,7 +52,7 @@ func (u *usecase) invalidVettingResponseHandler(s *discordgo.Session, m *discord
 		content := fmt.Sprintf("Hey <@%s>! It looks like you missed question 1. Please re-read the <#%s> again, we assure you that the code is in there. Thank you for your understanding.", m.Author.ID, cfg.Channel.RulesVetting)
 		_, err := s.ChannelMessageSendReply(cfg.Channel.Responses, content, m.Reference())
 		if err != nil {
-			log.Println(err)
+			u.errorReporter(err)
 			return
 		}
 	}

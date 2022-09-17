@@ -1,17 +1,20 @@
 package usecase
 
 import (
+	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"github.com/christiansoetanto/better-servant-of-servus-dei/config/configtypes"
+	"github.com/christiansoetanto/better-servant-of-servus-dei/util"
 	"log"
 )
 
 type commandHandler map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) error
 
 const (
-	PingCommand          = "pingv2"
-	SDVerifyCommand      = "sdverifyv2"
-	SDQuestionOneCommand = "sdquestiononev2"
-	CalendarCommand      = "calendarv2"
+	PingCommand          = "ping"
+	SDVerifyCommand      = "sdverify"
+	SDQuestionOneCommand = "sdquestionone"
+	CalendarCommand      = "calendar"
 	NiceTryBro           = "Nice try, bro! You are not allowed to use this command... <@255514888041005057>"
 )
 
@@ -22,37 +25,66 @@ func (u *usecase) registerSlashCommand() {
 			Name:        PingCommand,
 			Description: "Ping",
 		},
-		//{
-		//	Name:        SDVerifyCommand,
-		//	Description: "Command for verifying new peeps and welcoming them",
-		//	Options: []*discordgo.ApplicationCommandOption{
-		//		{
-		//			Type:        discordgo.ApplicationCommandOptionUser,
-		//			Name:        "user-option",
-		//			Description: "User to verify",
-		//			Required:    true,
-		//		},
-		//		{
-		//			Type:        discordgo.ApplicationCommandOptionString,
-		//			Name:        "role-option",
-		//			Description: "Religion role to give",
-		//			Required:    true,
-		//			Choices:     buildReligionRoleOptionChoices(),
-		//		},
-		//	},
-		//},
-		//{
-		//	Name:        SDQuestionOneCommand,
-		//	Description: "Command for alerting peeps that they missed question one code",
-		//	Options: []*discordgo.ApplicationCommandOption{
-		//		{
-		//			Type:        discordgo.ApplicationCommandOptionUser,
-		//			Name:        "user-option",
-		//			Description: "User to alert",
-		//			Required:    true,
-		//		},
-		//	},
-		//},
+		{
+			Name:        SDVerifyCommand,
+			Description: "Command for verifying new peeps and welcoming them",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionUser,
+					Name:        "user-option",
+					Description: "User to verify",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "role-option",
+					Description: "Religion role to give",
+					Required:    true,
+					Choices: []*discordgo.ApplicationCommandOptionChoice{
+						{
+							Name:  string(configtypes.LatinCatholic),
+							Value: configtypes.LatinCatholic,
+						},
+						{
+							Name:  string(configtypes.EasternCatholic),
+							Value: configtypes.EasternCatholic,
+						},
+						{
+							Name:  string(configtypes.OrthodoxChristian),
+							Value: configtypes.OrthodoxChristian,
+						},
+						{
+							Name:  string(configtypes.RCIACatechumen),
+							Value: configtypes.RCIACatechumen,
+						},
+						{
+							Name:  string(configtypes.Protestant),
+							Value: configtypes.Protestant,
+						},
+						{
+							Name:  string(configtypes.NonCatholic),
+							Value: configtypes.NonCatholic,
+						},
+						{
+							Name:  string(configtypes.Atheist),
+							Value: configtypes.Atheist,
+						},
+					},
+				},
+			},
+		},
+		{
+			Name:        SDQuestionOneCommand,
+			Description: "Command for alerting peeps that they missed question one code",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionUser,
+					Name:        "user-option",
+					Description: "User to alert",
+					Required:    true,
+				},
+			},
+		},
 		{
 			Name:        CalendarCommand,
 			Description: "Get today's liturgical calendar",
@@ -82,10 +114,10 @@ func (u *usecase) initCommandHandler() {
 
 func (u *usecase) commandHandlerBuilder() commandHandler {
 	return commandHandler{
-		PingCommand: u.pingCommandFunc,
-		//SDVerifyCommand:      u.sdVerifyCommandFunc,
-		//SDQuestionOneCommand: u.sdQuestionOneCommandFunc,
-		CalendarCommand: u.calendarCommandFunc,
+		PingCommand:          u.pingCommandFunc,
+		SDVerifyCommand:      u.sdVerifyCommandFunc,
+		SDQuestionOneCommand: u.sdQuestionOneCommandFunc,
+		CalendarCommand:      u.calendarCommandFunc,
 	}
 }
 
@@ -113,196 +145,190 @@ func (u *usecase) pingCommandFunc(s *discordgo.Session, i *discordgo.Interaction
 	return nil
 }
 
-//func (u *usecase) sdVerifyCommandFunc(s *discordgo.Session, i *discordgo.InteractionCreate) error {
-//	guildCfg, ok := u.getGuildConfig(i.GuildID)
-//
-//	if !ok {
-//		return nil
-//	}
-//
-//	if !u.isMod(i.Member.User.ID, guildCfg) {
-//		err := u.alertNonMod(i)
-//		if err != nil {
-//			return err
-//		}
-//		return nil
-//
-//	}
-//	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-//		Type: discordgo.InteractionResponseChannelMessageWithSource,
-//		Data: &discordgo.InteractionResponseData{
-//			Content: "Processing... please wait...",
-//		},
-//	})
-//	if err != nil {
-//		return err
-//	}
-//	// Access options in the order provided by the user.
-//	options := i.ApplicationCommandData().Options
-//	guildId := i.GuildID
-//
-//	// Or convert the slice into a map
-//	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
-//	for _, opt := range options {
-//		optionMap[opt.Name] = opt
-//	}
-//
-//	acknowledgementMessageArgs := make([]interface{}, 0, len(options))
-//	acknowledgementMessageFormat := guildCfg.Wording.AcknowledgementMessageFormat
-//	welcomeMessageArgs := make([]interface{}, 0, 1)
-//
-//	var user *discordgo.User
-//
-//	userOpt, userOptOk := optionMap["user-option"]
-//	roleOpt, roleOptOk := optionMap["role-option"]
-//	var roleType string
-//	if userOptOk && roleOptOk {
-//		user = userOpt.UserValue(s)
-//		acknowledgementMessageArgs = append(acknowledgementMessageArgs, user.ID)
-//		welcomeMessageArgs = append(welcomeMessageArgs, user.ID)
-//		welcomeMessageArgs = append(welcomeMessageArgs, guildCfg.Channel.ReactionRoles)
-//		welcomeMessageArgs = append(welcomeMessageArgs, guildCfg.Channel.ServerInformation)
-//
-//		//actually i dont need to put this in here, because user is required anyway. but just to be safe haha
-//		roleType = roleOpt.StringValue()
-//		roleId := guildCfg.ReligionRoleMappingMap[config.ReligionRoleType(roleType)]
-//		acknowledgementMessageArgs = append(acknowledgementMessageArgs, roleId)
-//
-//		err := s.GuildMemberRoleAdd(guildId, user.ID, string(roleId))
-//		if err != nil {
-//			fmt.Println(err)
-//			return err
-//		}
-//
-//		err = s.GuildMemberRoleAdd(guildId, user.ID, guildCfg.Role.ApprovedUser)
-//		if err != nil {
-//			return err
-//		}
-//		err = s.GuildMemberRoleRemove(guildId, user.ID, guildCfg.Role.Vetting)
-//		if err != nil {
-//			return err
-//		}
-//		err = s.GuildMemberRoleRemove(guildId, user.ID, guildCfg.Role.VettingQuestioning)
-//		if err != nil {
-//			return err
-//		}
-//
-//	} else {
-//		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-//			Content: "Please choose user and role.",
-//		})
-//		if err != nil {
-//			return err
-//		}
-//		return nil
-//	}
-//
-//	mod := i.Member
-//	content := fmt.Sprintf(guildCfg.Wording.WelcomeMessageFormat, user.Mention(), mod.Mention())
-//	_, err = s.ChannelMessageSend(guildCfg.Channel.GeneralDiscussion, content)
-//	if err != nil {
-//		return err
-//	}
-//
-//	_, err = s.ChannelMessageSendEmbed(guildCfg.Channel.GeneralDiscussion, util.EmbedBuilder(guildCfg.Wording.WelcomeTitle, fmt.Sprintf(guildCfg.Wording.WelcomeMessageEmbedFormat, welcomeMessageArgs...), util.RandomWelcomeImage()))
-//	if err != nil {
-//		return err
-//	}
-//	_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-//		Content: fmt.Sprintf(
-//			acknowledgementMessageFormat,
-//			acknowledgementMessageArgs...,
-//		),
-//	})
-//
-//	if err != nil {
-//		return err
-//	}
-//
-//	log.Printf("[%s] : [%s] | [%s] | [%s]", SDVerifyCommand, mod.User.Username, user.Username, roleType)
-//	return nil
-//}
-//
-//func (u *usecase) sdQuestionOneCommandFunc(s *discordgo.Session, i *discordgo.InteractionCreate) error {
-//
-//	guildConfig, ok := u.getGuildConfig(i.GuildID)
-//	if !ok {
-//		return nil
-//	}
-//	if !u.isMod(i.Member.User.ID, guildConfig) {
-//		err := u.alertNonMod(i)
-//		if err != nil {
-//			return err
-//		}
-//		return nil
-//	}
-//
-//	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-//		Type: discordgo.InteractionResponseChannelMessageWithSource,
-//		Data: &discordgo.InteractionResponseData{
-//			Content: "Processing... please wait...",
-//		},
-//	})
-//	if err != nil {
-//		return err
-//	}
-//	// Access options in the order provided by the user.
-//	options := i.ApplicationCommandData().Options
-//	guildId := i.GuildID
-//
-//	// Or convert the slice into a map
-//	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
-//	for _, opt := range options {
-//		optionMap[opt.Name] = opt
-//	}
-//
-//	missedQuestionOneMessageFormatArgs := make([]interface{}, 0)
-//	missedQuestionOneMessageFormat := guildConfig.Wording.MissedQuestionOneFormatNoPS
-//
-//	var user *discordgo.User
-//
-//	userOpt, userOptOk := optionMap["user-option"]
-//	if userOptOk {
-//		user = userOpt.UserValue(s)
-//		missedQuestionOneMessageFormatArgs = append(missedQuestionOneMessageFormatArgs, user.ID)
-//		missedQuestionOneMessageFormatArgs = append(missedQuestionOneMessageFormatArgs, guildConfig.Channel.RulesVetting)
-//		err := s.GuildMemberRoleAdd(guildId, user.ID, guildConfig.Role.VettingQuestioning)
-//		if err != nil {
-//			fmt.Println(err)
-//			return err
-//		}
-//	} else {
-//		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-//			Content: "Please choose user.",
-//		})
-//		if err != nil {
-//			return err
-//		}
-//		return nil
-//	}
-//
-//	mod := i.Member
-//
-//	_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-//		Content: fmt.Sprintf(
-//			missedQuestionOneMessageFormat,
-//			missedQuestionOneMessageFormatArgs...,
-//		),
-//	})
-//
-//	if err != nil {
-//		return err
-//	}
-//
-//	log.Printf("[%s] : [%s] | [%s]", SDQuestionOneCommand, mod.User.Username, user.Username)
-//	return nil
-//}
+func (u *usecase) sdQuestionOneCommandFunc(s *discordgo.Session, i *discordgo.InteractionCreate) error {
+	guildCfg, ok := u.getGuildConfig(i.GuildID)
+	if !ok {
+		return nil
+	}
+	if !u.isMod(i.Member.User.ID, guildCfg) {
+		err := u.alertNonMod(i)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: "Processing... Please wait...",
+		},
+	})
+	if err != nil {
+		return err
+	}
+	options := i.ApplicationCommandData().Options
+	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
+	for _, opt := range options {
+		optionMap[opt.Name] = opt
+	}
+
+	args := make([]interface{}, 0)
+
+	var user *discordgo.User
+
+	userOpt, userOptOk := optionMap["user-option"]
+	if userOptOk {
+		user = userOpt.UserValue(s)
+		args = append(args, user.ID)
+		args = append(args, guildCfg.Channel.RulesVetting)
+		err = s.GuildMemberRoleAdd(i.GuildID, user.ID, guildCfg.Role.VettingQuestioning)
+		if err != nil {
+			return err
+		}
+
+		_, err = s.ChannelMessageSendComplex(guildCfg.Channel.VettingQuestioning, &discordgo.MessageSend{
+			Content: fmt.Sprintf("<@%s>", user.ID),
+			Embed: util.EmbedBuilder("Vetting Police!", fmt.Sprintf(
+				guildCfg.Wording.MissedQuestionOneFormat,
+				args...,
+			)),
+		})
+		if err != nil {
+			return err
+		}
+
+		responseEdit := fmt.Sprintf("done please check <#%s>.", guildCfg.Channel.VettingQuestioning)
+		_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &responseEdit,
+		})
+
+		if err != nil {
+			return err
+		}
+	} else {
+		c := "Please select user"
+		_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &c,
+		})
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return nil
+}
+func (u *usecase) sdVerifyCommandFunc(s *discordgo.Session, i *discordgo.InteractionCreate) error {
+	guildCfg, ok := u.getGuildConfig(i.GuildID)
+	if !ok {
+		return nil
+	}
+	if !u.isMod(i.Member.User.ID, guildCfg) {
+		err := u.alertNonMod(i)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: "Processing... Please wait...",
+		},
+	})
+	if err != nil {
+		return err
+	}
+	options := i.ApplicationCommandData().Options
+	optionMap := make(map[string]*discordgo.ApplicationCommandInteractionDataOption, len(options))
+	for _, opt := range options {
+		optionMap[opt.Name] = opt
+	}
+
+	var user *discordgo.User
+
+	userOpt, userOptOk := optionMap["user-option"]
+	roleOpt, roleOptOk := optionMap["role-option"]
+	var roleType string
+	if userOptOk && roleOptOk {
+		user = userOpt.UserValue(s)
+		ackMessageArgs := make([]interface{}, 0, len(options))
+		ackMessageArgs = append(ackMessageArgs, user.ID)
+		welcomeMessageArgs := make([]interface{}, 0)
+		welcomeMessageArgs = append(welcomeMessageArgs, user.ID)
+		welcomeMessageArgs = append(welcomeMessageArgs, guildCfg.Channel.ReactionRoles)
+		welcomeMessageArgs = append(welcomeMessageArgs, guildCfg.Channel.ServerInformation)
+
+		roleType = roleOpt.StringValue()
+		roleId := guildCfg.ReligionRoleMappingMap[configtypes.ReligionRoleType(roleType)]
+		ackMessageArgs = append(ackMessageArgs, roleId)
+
+		err = s.GuildMemberRoleAdd(i.GuildID, user.ID, string(roleId))
+		if err != nil {
+			return err
+		}
+		err = s.GuildMemberRoleAdd(i.GuildID, user.ID, guildCfg.Role.ApprovedUser)
+		if err != nil {
+			return err
+		}
+		err = s.GuildMemberRoleRemove(i.GuildID, user.ID, guildCfg.Role.Vetting)
+		if err != nil {
+			return err
+		}
+		err = s.GuildMemberRoleRemove(i.GuildID, user.ID, guildCfg.Role.VettingQuestioning)
+		if err != nil {
+			return err
+		}
+		mod := i.Member
+		content := fmt.Sprintf(guildCfg.Wording.WelcomeMessageFormat, user.Mention(), mod.Mention())
+		_, err = s.ChannelMessageSend(guildCfg.Channel.GeneralDiscussion, content)
+		if err != nil {
+			return err
+		}
+
+		_, err = s.ChannelMessageSendEmbed(
+			guildCfg.Channel.GeneralDiscussion,
+			util.EmbedBuilder(
+				guildCfg.Wording.WelcomeTitle,
+				fmt.Sprintf(guildCfg.Wording.WelcomeMessageEmbedFormat, welcomeMessageArgs...),
+				util.ImageUrl(util.RandomWelcomeImage()),
+			),
+		)
+		if err != nil {
+			return err
+		}
+		emptyString := ""
+		_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &emptyString,
+			Embeds: &[]*discordgo.MessageEmbed{
+				util.EmbedBuilder("Verify Police!", fmt.Sprintf(
+					guildCfg.Wording.VerifyAckMessageFormat,
+					ackMessageArgs...,
+				)),
+			},
+		})
+
+		if err != nil {
+			return err
+		}
+	} else {
+		c := "Please choose user and role."
+		_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &c,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 func (u *usecase) calendarCommandFunc(s *discordgo.Session, i *discordgo.InteractionCreate) error {
 	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Processing... please wait...",
+			Content: "Processing... Please wait...",
 		},
 	})
 	if err != nil {
@@ -311,7 +337,6 @@ func (u *usecase) calendarCommandFunc(s *discordgo.Session, i *discordgo.Interac
 
 	embed, err := u.generateCalendarEmbed()
 	if err != nil {
-		u.errorReporter(err)
 		return err
 	}
 	emptyString := ""
@@ -323,7 +348,6 @@ func (u *usecase) calendarCommandFunc(s *discordgo.Session, i *discordgo.Interac
 	})
 
 	if err != nil {
-		u.errorReporter(err)
 		return err
 	}
 

@@ -4,6 +4,16 @@ import (
 	"github.com/christiansoetanto/better-servant-of-servus-dei/config/configtypes"
 )
 
+const (
+	devLatinCatholicRoleId     = "974630535395680337"
+	devEasternCatholicRoleId   = "974667212587671613"
+	devOrthodoxChristianRoleId = "974667248826449950"
+	devRCIACatechumenRoleId    = "974667251498225704"
+	devProtestantRoleId        = "974667253045919784"
+	devNonCatholicRoleId       = "974667254627201084"
+	devAtheistRoleId           = "974667257122795570"
+)
+
 func getDevGuildConfig() configtypes.GuildConfig {
 	return configtypes.GuildConfig{
 		Guild: configtypes.Guild{
@@ -29,13 +39,13 @@ func getDevGuildConfig() configtypes.GuildConfig {
 			Vetting:            "974632148952809482",
 			VettingQuestioning: "974632188823863296",
 			ApprovedUser:       "974632216304943155",
-			LatinCatholic:      "974630535395680337",
-			EasternCatholic:    "974667212587671613",
-			OrthodoxChristian:  "974667248826449950",
-			RCIACatechumen:     "974667251498225704",
-			Protestant:         "974667253045919784",
-			NonCatholic:        "974667254627201084",
-			Atheist:            "974667257122795570",
+			LatinCatholic:      devLatinCatholicRoleId,
+			EasternCatholic:    devEasternCatholicRoleId,
+			OrthodoxChristian:  devOrthodoxChristianRoleId,
+			RCIACatechumen:     devRCIACatechumenRoleId,
+			Protestant:         devProtestantRoleId,
+			NonCatholic:        devNonCatholicRoleId,
+			Atheist:            devAtheistRoleId,
 			Moderator:          "1013781460953616404",
 		},
 		Moderator: configtypes.Moderator{
@@ -48,11 +58,20 @@ func getDevGuildConfig() configtypes.GuildConfig {
 			ReligiousDiscussionsTwoBallotBoxWithCheck: "☑️",
 		},
 		Wording: configtypes.Wording{
-			AcknowledgementMessageFormat: "Verification of user <@%s> with role <@&%s> is successful.\nThank you for using my service. Beep. Boop.\n",
-			WelcomeMessageEmbedFormat:    "Welcome to Servus Dei, <@%s>! We are happy to have you! Make sure you check out <#%s> to gain access to the various channels we offer and please do visit <#%s> so you can understand our server better and take use of everything we have to offer. God Bless!",
-			MissedQuestionOneFormat:      "Hey <@%s>! It looks like you missed question 1. Please re-read the <#%s> again, we assure you that the code is in there. Thank you for your understanding.",
-			WelcomeTitle:                 "Welcome to Servus Dei!",
-			WelcomeMessageFormat:         "Hey %s! %s just approved your vetting response. Welcome to the server. Feel free to tag us should you have further questions. Enjoy!",
+			VerifyAckMessageFormat:    "Verification of user <@%s> with role <@&%s> is successful.\nThank you for using my service. Beep. Boop.\n",
+			WelcomeMessageEmbedFormat: "Welcome to Servus Dei, <@%s>! We are happy to have you! Make sure you check out <#%s> to gain access to the various channels we offer and please do visit <#%s> so you can understand our server better and take use of everything we have to offer. God Bless!",
+			MissedQuestionOneFormat:   "Hey <@%s>! It looks like you missed question 1. Please re-read the <#%s> again, we assure you that the code is in there. Thank you.",
+			WelcomeTitle:              "Welcome to Servus Dei!",
+			WelcomeMessageFormat:      "Hey %s! %s just approved your vetting response. Welcome to the server. Feel free to tag us should you have further questions. Enjoy!",
+		},
+		ReligionRoleMappingMap: map[configtypes.ReligionRoleType]configtypes.ReligionRoleId{
+			configtypes.LatinCatholic:     devLatinCatholicRoleId,
+			configtypes.EasternCatholic:   devEasternCatholicRoleId,
+			configtypes.OrthodoxChristian: devOrthodoxChristianRoleId,
+			configtypes.RCIACatechumen:    devRCIACatechumenRoleId,
+			configtypes.Protestant:        devProtestantRoleId,
+			configtypes.NonCatholic:       devNonCatholicRoleId,
+			configtypes.Atheist:           devAtheistRoleId,
 		},
 	}
 

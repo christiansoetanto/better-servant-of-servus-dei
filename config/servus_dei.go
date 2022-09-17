@@ -4,6 +4,16 @@ import (
 	"github.com/christiansoetanto/better-servant-of-servus-dei/config/configtypes"
 )
 
+const (
+	servusDeiLatinCatholicRoleId     = "751145824532168775"
+	servusDeiEasternCatholicRoleId   = "751148911267414067"
+	servusDeiOrthodoxChristianRoleId = "751148354716565656"
+	servusDeiRCIACatechumenRoleId    = "751196794771472395"
+	servusDeiProtestantRoleId        = "751145951137103872"
+	servusDeiNonCatholicRoleId       = "751146099351224382"
+	servusDeiAtheistRoleId           = "751148904938209351"
+)
+
 func getServusDeiGuildConfig() configtypes.GuildConfig {
 	return configtypes.GuildConfig{
 		Guild: configtypes.Guild{
@@ -29,13 +39,13 @@ func getServusDeiGuildConfig() configtypes.GuildConfig {
 			Vetting:            "751145124834312342",
 			VettingQuestioning: "914986915030241301",
 			ApprovedUser:       "751144797938384979",
-			LatinCatholic:      "751145824532168775",
-			EasternCatholic:    "751148911267414067",
-			OrthodoxChristian:  "751148354716565656",
-			RCIACatechumen:     "751196794771472395",
-			Protestant:         "751145951137103872",
-			NonCatholic:        "751146099351224382",
-			Atheist:            "751148904938209351",
+			LatinCatholic:      servusDeiLatinCatholicRoleId,
+			EasternCatholic:    servusDeiEasternCatholicRoleId,
+			OrthodoxChristian:  servusDeiOrthodoxChristianRoleId,
+			RCIACatechumen:     servusDeiRCIACatechumenRoleId,
+			Protestant:         servusDeiProtestantRoleId,
+			NonCatholic:        servusDeiNonCatholicRoleId,
+			Atheist:            servusDeiAtheistRoleId,
 			Moderator:          "751144316843327599",
 		},
 		Moderator: configtypes.Moderator{
@@ -55,14 +65,26 @@ func getServusDeiGuildConfig() configtypes.GuildConfig {
 			"501368090504986627": "athanasius",
 		},
 		Reaction: configtypes.Reaction{
-			Upvote: "762045856592822342",
+			Upvote:                               "762045856592822342",
+			Dab:                                  "<:Dab:847137540783210548>",
+			ReligiousDiscussionOneWhiteCheckmark: "✅",
+			ReligiousDiscussionsTwoBallotBoxWithCheck: "☑️",
 		},
 		Wording: configtypes.Wording{
-			AcknowledgementMessageFormat: "Verification of user <@%s> with role <@&%s> is successful.\nThank you for using my service. Beep. Boop.\n",
-			WelcomeMessageEmbedFormat:    "Welcome to Servus Dei, <@%s>! We are happy to have you! Make sure you check out <#%s> to gain access to the various channels we offer and please do visit <#%s> so you can understand our server better and take use of everything we have to offer. God Bless!",
-			MissedQuestionOneFormat:      "Hey <@%s>! It looks like you missed question 1. Please re-read the <#%s> again, we assure you that the code is in there. Thank you for your understanding.",
-			WelcomeTitle:                 "Welcome to Servus Dei!",
-			WelcomeMessageFormat:         "Hey %s! %s just approved your vetting response. Welcome to the server. Feel free to tag us should you have further questions. Enjoy!",
+			VerifyAckMessageFormat:    "Verification of user <@%s> with role <@&%s> is successful.\nThank you for using my service. Beep. Boop.\n",
+			WelcomeMessageEmbedFormat: "Welcome to Servus Dei, <@%s>! We are happy to have you! Make sure you check out <#%s> to gain access to the various channels we offer and please do visit <#%s> so you can understand our server better and take use of everything we have to offer. God Bless!",
+			MissedQuestionOneFormat:   "Hey <@%s>! It looks like you missed question 1. Please re-read the <#%s> again, we assure you that the code is in there. Thank you!",
+			WelcomeTitle:              "Welcome to Servus Dei!",
+			WelcomeMessageFormat:      "Hey %s! %s just approved your vetting response. Welcome to the server. Feel free to tag us should you have further questions. Enjoy!",
+		},
+		ReligionRoleMappingMap: map[configtypes.ReligionRoleType]configtypes.ReligionRoleId{
+			configtypes.LatinCatholic:     servusDeiLatinCatholicRoleId,
+			configtypes.EasternCatholic:   servusDeiEasternCatholicRoleId,
+			configtypes.OrthodoxChristian: servusDeiOrthodoxChristianRoleId,
+			configtypes.RCIACatechumen:    servusDeiRCIACatechumenRoleId,
+			configtypes.Protestant:        servusDeiProtestantRoleId,
+			configtypes.NonCatholic:       servusDeiNonCatholicRoleId,
+			configtypes.Atheist:           servusDeiAtheistRoleId,
 		},
 	}
 }

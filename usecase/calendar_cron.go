@@ -69,6 +69,7 @@ func (u *usecase) generateCalendarEmbed() (*discordgo.MessageEmbed, error) {
 	functionsUrl := os.Getenv("ROMCAL_API_FUNCTIONS_URL")
 	response, err := http.Get(functionsUrl)
 	if err != nil {
+		u.errorReporter(err)
 		return nil, err
 	}
 	data, _ := ioutil.ReadAll(response.Body)
@@ -80,9 +81,17 @@ func (u *usecase) generateCalendarEmbed() (*discordgo.MessageEmbed, error) {
 	}
 
 	currentTime := time.Now()
-	text := getCelebrations(allLiturgicalDays.LiturgicalDaysEn)
+	text, isAnyHDO := getCelebrations(allLiturgicalDays.LiturgicalDaysEn)
 	title := fmt.Sprintf("%s, %d %s %d", currentTime.Weekday(), currentTime.Day(), currentTime.Month(), currentTime.Year())
-	embed := util.EmbedBuilder(title, text)
+	var fields []*discordgo.MessageEmbedField
+	if isAnyHDO {
+		fields = append(fields, &discordgo.MessageEmbedField{
+			Name:   "Disclaimer:",
+			Value:  "The rule for Holy Day of Obligation can vary between dioceses as per Code of Canon Law Can. 1246. Please consult with your local priest if you have any doubt.",
+			Inline: false,
+		})
+	}
+	embed := util.EmbedBuilder(title, text, fields)
 	return embed, nil
 }
 
@@ -93,7 +102,7 @@ func (u *usecase) liturgicalCalendarCronJob() {
 		return
 	}
 	for _, config := range u.Config.GuildConfig {
-		_, err = u.Session.ChannelMessageSendEmbed(config.Channel.BotTesting, embed)
+		_, err = u.Session.ChannelMessageSendEmbed(config.Channel.LiturgicalCalendarDiscussion, embed)
 		if err != nil {
 			u.errorReporter(err)
 			return
@@ -101,8 +110,9 @@ func (u *usecase) liturgicalCalendarCronJob() {
 	}
 }
 
-func getCelebrations(liturgicalDays []LiturgicalDay) string {
+func getCelebrations(liturgicalDays []LiturgicalDay) (string, bool) {
 	text := "The Roman Catholic Church is celebrating:\n"
+	isAnyHDO := false
 	for _, day := range liturgicalDays {
 		text += "• "
 		//[day, date] //if memorial/feast/solemnity [rank] [name] in [seasonName] season.
@@ -118,11 +128,12 @@ func getCelebrations(liturgicalDays []LiturgicalDay) string {
 		}
 
 		if isHolyDayOfObligation {
-			text += ". A Holy Day of Obligation"
+			text += ", a Holy Day of Obligation"
+			isAnyHDO = true
 		}
 
 		text += ".\n"
 	}
-	return text
+	return text, isAnyHDO
 
 }

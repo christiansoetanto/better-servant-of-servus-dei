@@ -1,6 +1,9 @@
 package util
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"github.com/bwmarrin/discordgo"
+	"math/rand"
+)
 
 const (
 	WelcomeTitle        = "Welcome to Servus Dei!"
@@ -15,6 +18,10 @@ const (
 
 type ImageUrl string
 
+func RandomWelcomeImage() string {
+	in := []string{WelcomeImageURL, WelcomeImage2URL}
+	return in[rand.Intn(len(in))]
+}
 func EmbedBuilder(title string, description string, param ...interface{}) *discordgo.MessageEmbed {
 	var imageUrl string
 	var fields []*discordgo.MessageEmbedField
