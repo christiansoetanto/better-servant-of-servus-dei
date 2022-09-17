@@ -56,7 +56,6 @@ func (u *usecase) religiousQuestionReactionAddHandler(s *discordgo.Session, m *d
 	if answers == nil {
 		return
 	}
-
 	answers, err = u.generateAnswerUrl(answers, question, cfg.Guild.GuildID)
 	if err != nil {
 		u.errorReporter(err)
