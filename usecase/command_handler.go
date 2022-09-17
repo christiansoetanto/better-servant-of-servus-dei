@@ -281,19 +281,15 @@ func (u *usecase) sdVerifyCommandFunc(s *discordgo.Session, i *discordgo.Interac
 		}
 		mod := i.Member
 		content := fmt.Sprintf(guildCfg.Wording.WelcomeMessageFormat, user.Mention(), mod.Mention())
-		_, err = s.ChannelMessageSend(guildCfg.Channel.GeneralDiscussion, content)
-		if err != nil {
-			return err
-		}
-
-		_, err = s.ChannelMessageSendEmbed(
-			guildCfg.Channel.GeneralDiscussion,
-			util.EmbedBuilder(
+		_, err = s.ChannelMessageSendComplex(guildCfg.Channel.GeneralDiscussion, &discordgo.MessageSend{
+			Content: content,
+			Embed: util.EmbedBuilder(
 				guildCfg.Wording.WelcomeTitle,
 				fmt.Sprintf(guildCfg.Wording.WelcomeMessageEmbedFormat, welcomeMessageArgs...),
 				util.ImageUrl(util.RandomWelcomeImage()),
 			),
-		)
+		})
+
 		if err != nil {
 			return err
 		}
