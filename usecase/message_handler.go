@@ -50,7 +50,7 @@ func (u *usecase) invalidVettingResponseHandler(s *discordgo.Session, m *discord
 	fmt.Println(m.Content, m.GuildID, m.ChannelID)
 	if !isValidVettingResponse(m.Content) {
 		content := fmt.Sprintf("Hey <@%s>! It looks like you missed question 1. Please re-read the <#%s> again, we assure you that the code is in there. Thank you for your understanding.", m.Author.ID, cfg.Channel.RulesVetting)
-		_, err := s.ChannelMessageSendEmbedReply(cfg.Channel.Responses, util.EmbedBuilder("Vetting Police!", content), m.Reference())
+		_, err := s.ChannelMessageSendEmbedReply(cfg.Channel.Responses, util.EmbedBuilder(fmt.Sprintf("%s Vetting %s", cfg.Reaction.Dab, cfg.Reaction.Dab), content), m.Reference())
 		if err != nil {
 			u.errorReporter(err)
 			return
@@ -69,7 +69,7 @@ func (u *usecase) vettingQuestioningResponseHandler(s *discordgo.Session, m *dis
 		return
 	}
 	if strings.Contains(util.OnlyAlphanumAndSpace(m.Content), INRI) {
-		title := fmt.Sprintf("Vetting Police! %s", cfg.Reaction.Dab)
+		title := fmt.Sprintf("%s Vetting %s", cfg.Reaction.Dab, cfg.Reaction.Dab)
 		description := fmt.Sprintf("\nNice job, <@%s>! <@&%s> give this man a cookie.\n\n\nPS: this is a joke. please wait for our human (or are they) mods to verify you.", m.Author.ID, cfg.Role.Moderator)
 		embed := util.EmbedBuilder(title, description)
 		content := fmt.Sprintf("Come here you <@&%s>. Look at this dude <@%s>", cfg.Role.Moderator, m.Author.ID)

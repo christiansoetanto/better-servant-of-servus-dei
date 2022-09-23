@@ -148,7 +148,7 @@ func (u *usecase) generateAnswerUrl(answerMap answersMap, question, guildId stri
 }
 
 func (u *usecase) archiveQuestion(answers answersMap, questionAskerId, questionId, questionContent string, cfg configtypes.GuildConfig) error {
-	title := "Religious Question Police!"
+	title := fmt.Sprintf("%s Religious Question %s", cfg.Reaction.Dab, cfg.Reaction.Dab)
 	description := fmt.Sprintf("\nQuestion by <@%s>:\n\n%s\n", questionAskerId, questionContent)
 	fieldValue := ""
 	fieldName := "Answer(s):"

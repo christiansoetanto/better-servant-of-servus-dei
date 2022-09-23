@@ -188,7 +188,7 @@ func (u *usecase) sdQuestionOneCommandFunc(s *discordgo.Session, i *discordgo.In
 
 		_, err = s.ChannelMessageSendComplex(guildCfg.Channel.VettingQuestioning, &discordgo.MessageSend{
 			Content: fmt.Sprintf("<@%s>", user.ID),
-			Embed: util.EmbedBuilder("Vetting Police!", fmt.Sprintf(
+			Embed: util.EmbedBuilder(fmt.Sprintf("%s Vetting %s", guildCfg.Reaction.Dab, guildCfg.Reaction.Dab), fmt.Sprintf(
 				guildCfg.Wording.MissedQuestionOneFormat,
 				args...,
 			)),
@@ -297,7 +297,7 @@ func (u *usecase) sdVerifyCommandFunc(s *discordgo.Session, i *discordgo.Interac
 		_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 			Content: &emptyString,
 			Embeds: &[]*discordgo.MessageEmbed{
-				util.EmbedBuilder("Verify Police!", fmt.Sprintf(
+				util.EmbedBuilder(fmt.Sprintf("%s Verify %s", guildCfg.Reaction.Dab, guildCfg.Reaction.Dab), fmt.Sprintf(
 					guildCfg.Wording.VerifyAckMessageFormat,
 					ackMessageArgs...,
 				)),
