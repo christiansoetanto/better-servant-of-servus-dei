@@ -19,7 +19,7 @@ func (u *usecase) initMessageHandler() {
 }
 
 func detectVettingResponse(input string) bool {
-	reg, err := regexp.Compile(".*1.*2.*3.*4.*5.*6.*")
+	reg, err := regexp.Compile(".*2.*3.*4.*5.*6.*")
 	if err != nil {
 		log.Println(err)
 		return false
