@@ -84,7 +84,7 @@ func (u *usecase) generateCalendarEmbed() (*discordgo.MessageEmbed, error) {
 	text, isAnyHDO := getCelebrations(allLiturgicalDays.LiturgicalDaysEn)
 	title := fmt.Sprintf("%s, %d %s %d", currentTime.Weekday(), currentTime.Day(), currentTime.Month(), currentTime.Year())
 	var fields []*discordgo.MessageEmbedField
-	if isAnyHDO {
+	if isAnyHDO && currentTime.Weekday() != time.Sunday {
 		fields = append(fields, &discordgo.MessageEmbedField{
 			Name:   "Disclaimer:",
 			Value:  "The rule for Holy Day of Obligation can vary between dioceses as per Code of Canon Law Can. 1246. Please consult with your local priest if you have any doubt.",
