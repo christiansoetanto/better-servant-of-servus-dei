@@ -27,8 +27,18 @@ func detectVettingResponse(input string) bool {
 	return strings.Contains(input, ANDGIVEUSTHECODE) || strings.Contains(input, WHATCODE) || reg.MatchString(input)
 }
 
-func isValidVettingResponse(input string) bool {
+func sanitizeVettingResponse(input string) string {
+	var regex, err = regexp.Compile("(<(@|@&|#)(.*)?>)")
+	if err != nil {
+		return input
+	}
+	input = regex.ReplaceAllLiteralString(input, "")
 	input = strings.ReplaceAll(util.ToOnlyAlphanum(input), "latinrite", "")
+	return input
+}
+
+func isValidVettingResponse(input string) bool {
+	input = sanitizeVettingResponse(input)
 	if detectVettingResponse(input) && !strings.Contains(input, INRI) {
 		return false
 	}

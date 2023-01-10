@@ -162,11 +162,13 @@ func (u *usecase) archiveQuestion(answers answersMap, questionAskerId, questionI
 	}
 
 	var fields []*discordgo.MessageEmbedField
-	fields = append(fields, &discordgo.MessageEmbedField{
-		Name:   fieldName,
-		Value:  fieldValue,
-		Inline: false,
-	})
+	if fieldValue != "" {
+		fields = append(fields, &discordgo.MessageEmbedField{
+			Name:   fieldName,
+			Value:  fieldValue,
+			Inline: false,
+		})
+	}
 	embed := util.EmbedBuilder(title, description, fields)
 
 	_, err := u.Session.ChannelMessageSendEmbed(cfg.Channel.AnsweredQuestions, embed)

@@ -34,7 +34,7 @@ func EmbedBuilder(title string, description string, param ...interface{}) *disco
 		}
 
 	}
-	return &discordgo.MessageEmbed{
+	embed := &discordgo.MessageEmbed{
 		Type:        discordgo.EmbedTypeRich,
 		Title:       title,
 		Description: description,
@@ -43,10 +43,13 @@ func EmbedBuilder(title string, description string, param ...interface{}) *disco
 			Text:    FooterText,
 			IconURL: LogoURL,
 		},
-		Image: &discordgo.MessageEmbedImage{
-			URL: imageUrl,
-		},
 		URL:    ServusDeiWebsiteURL,
 		Fields: fields,
 	}
+	if imageUrl != "" {
+		embed.Image = &discordgo.MessageEmbedImage{
+			URL: imageUrl,
+		}
+	}
+	return embed
 }
