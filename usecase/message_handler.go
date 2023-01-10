@@ -92,6 +92,7 @@ func (u *usecase) vettingQuestioningResponseHandler(s *discordgo.Session, m *dis
 			u.errorReporter(err)
 			return
 		}
+
 		err = s.ChannelMessageDelete(m.ChannelID, m.ID)
 		if err != nil {
 			u.errorReporter(err)
