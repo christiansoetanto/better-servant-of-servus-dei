@@ -80,9 +80,9 @@ func (u *usecase) vettingQuestioningResponseHandler(s *discordgo.Session, m *dis
 	}
 	if strings.Contains(util.OnlyAlphanumAndSpace(m.Content), INRI) {
 		title := fmt.Sprintf("%s Vetting %s", cfg.Reaction.Dab, cfg.Reaction.Dab)
-		description := fmt.Sprintf("\nNice job, <@%s>! <@&%s> give this man a cookie.\n\n\nPS: this is a joke. please wait for our human (or are they) mods to verify you.", m.Author.ID, cfg.Role.Moderator)
+		description := fmt.Sprintf("\nYou got the code right, <@%s>. Kindly wait for the mods to verify you.", m.Author.ID)
 		embed := util.EmbedBuilder(title, description)
-		content := fmt.Sprintf("Come here you <@&%s>. Look at this dude <@%s>", cfg.Role.Moderator, m.Author.ID)
+		content := fmt.Sprintf("<@&%s>", cfg.Role.Moderator)
 		_, err := s.ChannelMessageSendComplex(cfg.Channel.VettingQuestioning, &discordgo.MessageSend{
 			Content:   content,
 			Embed:     embed,
