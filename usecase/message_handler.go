@@ -57,7 +57,6 @@ func (u *usecase) invalidVettingResponseHandler(s *discordgo.Session, m *discord
 		return
 	}
 
-	fmt.Println(m.Content, m.GuildID, m.ChannelID)
 	if !isValidVettingResponse(m.Content) {
 		content := fmt.Sprintf("Hey <@%s>! It looks like you missed question 1. Please re-read the <#%s> again, we assure you that the code is in there. Thank you for your understanding.", m.Author.ID, cfg.Channel.RulesVetting)
 		_, err := s.ChannelMessageSendEmbedReply(cfg.Channel.Responses, util.EmbedBuilder(fmt.Sprintf("%s Vetting %s", cfg.Reaction.Dab, cfg.Reaction.Dab), content), m.Reference())
