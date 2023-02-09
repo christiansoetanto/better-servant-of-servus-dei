@@ -116,7 +116,6 @@ func (u *usecase) generateAnswerUrl(answerMap answersMap, question, guildId stri
 		lastMessageId := ""
 		totalAnswerToBeFound := len(answers)
 		for i := 0; i < MaxMessageAmount/LimitPerRequest && totalAnswerToBeFound > 0; i++ {
-			fmt.Printf("current iter: %d, max iter: %d, answer left: %d\n", i, MaxMessageAmount/LimitPerRequest, totalAnswerToBeFound)
 			messages, err := u.Session.ChannelMessages(channelId, LimitPerRequest, lastMessageId, "", "")
 			if err != nil {
 				u.errorReporter(err)
