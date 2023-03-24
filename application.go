@@ -17,6 +17,22 @@ import (
 func main() {
 	fmt.Println("Hello World!")
 	ctx := context.Background()
+
+	pauseMode, err := strconv.ParseBool(os.Getenv("PAUSEMODE"))
+	if err != nil {
+		log.Fatal("Error parsing PAUSEMODE environment variable")
+		return
+	}
+
+	if pauseMode {
+		// Wait here until CTRL-C or other term signal is received.
+		fmt.Println("entering pause mode")
+		sc := make(chan os.Signal, 1)
+		//syscall.SIGTERM,
+		signal.Notify(sc, syscall.SIGINT)
+		<-sc
+		log.Println("Gracefully shutting down.")
+	}
 	devMode, err := strconv.ParseBool(os.Getenv("DEVMODE"))
 	if err != nil {
 		log.Fatal("Error parsing DEVMODE environment variable")
